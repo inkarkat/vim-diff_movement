@@ -27,13 +27,26 @@ let s:diffHunkHeaderPattern = '^\%(\d\+\%(,\d\+\)\=[cda]\d\+\>\|\*\{4,}$\|@@.*@@
 
 call custommotion#MakeBracketMotionWithCountSearch('<buffer>', '', '', 
 \   s:diffHunkHeaderPattern,
-\   '^\%(---\|+++\)\@!.*\n' . s:diffHunkHeaderPattern. '\|^.*\%$'
+\   '^\%(--- \|+++ \)\@!.*\n' . s:diffHunkHeaderPattern. '\|^\%(\*\{4,}\|=\{10,}\)\@!.*\n^\*\*\* \|^\%(\*\*\* \|=\{10,}\)\@!.*\n^--- .*\%( ----\)\@<!$\|^.*\nIndex: \|^.*\%$'
 \)
 " For the pattern-to-end, search for the line above the hunk header pattern, but
 " exclude lines of the diff header (ending with --- in context diffs and +++ in
-" unified diffs; traditional diffs have no header). Also match the last line of
-" the buffer, because there's no special "end of diff" line, diffs just end
-" after the last hunk. 
+" unified diffs; traditional diffs have no header).
+" Also match the start of a new diff file 
+" - starting with *** in context diffs, but only if the preceding line doesn't
+"   start with: 
+"   - many ****'s, or it's the separator of a context diff
+"   - many ==='s, or it's the separator after an Index:
+" - starting with --- in unified diffs, but not matching --- .* ----, the
+"   separator in a context diff, but only if the preceding line doesn't start
+"   with: 
+"   - ***, or it's a context diff
+"   - many ==='s, or it's the separator after an Index:
+" - or a line starting with 'Index:')
+" Finally match the last line of the buffer, because there's no special "end of
+" diff" line, diffs just end after the last hunk.  
+
+unlet s:diffHunkHeaderPattern
 
 let &cpo = s:save_cpo
 unlet s:save_cpo
