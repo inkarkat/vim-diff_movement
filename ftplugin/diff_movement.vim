@@ -25,7 +25,7 @@ set cpo&vim
 "   traditional | context | unified
 let s:diffHunkHeaderPattern = '^\%(\d\+\%(,\d\+\)\=[cda]\d\+\>\|\*\{4,}$\|@@.*@@\)'
 
-call custommotion#MakeBracketMotionWithCountSearch('<buffer>', ']', '[', 
+call custommotion#MakeBracketMotionWithCountSearch('<buffer>', '', '', 
 \   s:diffHunkHeaderPattern,
 \   '^\%(---\|+++\)\@!.*\n' . s:diffHunkHeaderPattern. '\|^.*\%$'
 \)
