@@ -27,7 +27,8 @@ let s:diffHunkHeaderPattern = '^\%(\d\+\%(,\d\+\)\=[cda]\d\+\>\|\*\{4,}$\|@@.*@@
 
 call custommotion#MakeBracketMotionWithCountSearch('<buffer>', '', '', 
 \   s:diffHunkHeaderPattern,
-\   '^\%(--- \|+++ \)\@!.*\n' . s:diffHunkHeaderPattern. '\|^\%(\*\{4,}\|=\{10,}\|diff \)\@!.*\n^\*\*\* \|^\%(\*\*\* \|=\{10,}\|diff \)\@!.*\n^--- .*\%( ----\)\@<!$\|^.*\nIndex: \|^.*\ndiff \|^.*\%$'
+\   '^\%(--- \|+++ \)\@!.*\n' . s:diffHunkHeaderPattern. '\|^\%(\*\{4,}\|=\{10,}\|diff \)\@!.*\n^\*\*\* \|^\%(\*\*\* \|=\{10,}\|diff \)\@!.*\n^--- .*\%( ----\)\@<!$\|^.*\nIndex: \|^.*\ndiff \|^.*\%$',
+\   0
 \)
 " For the pattern-to-end, search for the line above the hunk header pattern, but
 " exclude lines of the diff header (ending with --- in context diffs and +++ in
