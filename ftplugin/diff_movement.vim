@@ -25,11 +25,6 @@ set cpo&vim
 "   traditional | context | unified
 let s:diffHunkHeaderPattern = '^\%(\d\+\%(,\d\+\)\=[cda]\d\+\>\|\*\{4,}$\|@@.*@@\)'
 
-call custommotion#MakeBracketMotionWithCountSearch('<buffer>', '', '', 
-\   s:diffHunkHeaderPattern,
-\   '^\%(--- \|+++ \)\@!.*\n' . s:diffHunkHeaderPattern. '\|^\%(\*\{4,}\|=\{10,}\|diff \)\@!.*\n^\*\*\* \|^\%(\*\*\* \|=\{10,}\|diff \)\@!.*\n^--- .*\%( ----\)\@<!$\|^.*\nIndex: \|^.*\ndiff \|^.*\%$',
-\   0
-\)
 " For the pattern-to-end, search for the line above the hunk header pattern, but
 " exclude lines of the diff header (ending with --- in context diffs and +++ in
 " unified diffs; traditional diffs have no header).
@@ -48,8 +43,25 @@ call custommotion#MakeBracketMotionWithCountSearch('<buffer>', '', '',
 " - or a line starting with 'Index: ' or 'diff '
 " Finally match the last line of the buffer, because there's no special "end of
 " diff" line, diffs just end after the last hunk.  
+let s:diffHunkEndPattern = join(
+\   [
+\	'^\%(--- \|+++ \)\@!.*\n' . s:diffHunkHeaderPattern,
+\	'^\%(\*\{4,}\|=\{10,}\|diff \)\@!.*\n^\*\*\* ',
+\	'^\%(\*\*\* \|=\{10,}\|diff \)\@!.*\n^--- .*\%( ----\)\@<!$',
+\	'^.*\nIndex: ',
+\	'^.*\ndiff ',
+\	'^.*\%$'
+\   ], '\|'
+\)
+
+call custommotion#MakeBracketMotionWithCountSearch('<buffer>', '', '', 
+\   s:diffHunkHeaderPattern,
+\   s:diffHunkEndPattern,
+\   0
+\)
 
 unlet s:diffHunkHeaderPattern
+unlet s:diffHunkEndPattern
 
 let &cpo = s:save_cpo
 unlet s:save_cpo
