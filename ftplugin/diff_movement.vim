@@ -1,7 +1,8 @@
 " diff_movement.vim: Movement over diff hunks with ]] etc. 
 "
 " DEPENDENCIES:
-"   - custommotion.vim autoload script. 
+"   - CountJump.vim, CountJump/Motion.vim, CountJump/TextObjects.vim autoload
+"     scripts. 
 "
 " Copyright: (C) 2009 by Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'. 
@@ -10,6 +11,11 @@
 "
 " REVISION	DATE		REMARKS 
 "	001	12-Feb-2009	file creation from vim_movement.vim
+
+" Avoid installing when in unsupported Vim version. 
+if v:version < 700
+    finish
+endif 
 
 let s:save_cpo = &cpo
 set cpo&vim
@@ -55,20 +61,25 @@ let s:diffHunkEndPattern = join(
 \   ], '\|'
 \)
 
-call custommotion#MakeBracketMotionWithCountSearch('<buffer>', '', '', 
+call CountJump#Motion#MakeBracketMotion('<buffer>', '', '', 
 \   s:diffHunkHeaderPattern,
 \   s:diffHunkEndPattern,
 \   0
 \)
 
+
+"ih			"inner hunk" text object, select [count] hunk contents. 
+"ah			"a hunk" text object, select [count] hunks, including
+"			the header. 
+" Note: For context diffs, these selections are off by one or a few lines. 
 function! s:function(name)
     return function(substitute(a:name, '^s:', matchstr(expand('<sfile>'), '<SNR>\d\+_\zefunction$'),''))
 endfunction 
 function! s:JumpToHunkBegin( count, isInner )
-    return custommotion#CountSearch(a:count, [s:diffHunkHeaderPattern, 'bW' . (a:isInner ? 'e' : '')])
+    return CountJump#CountSearch(a:count, [s:diffHunkHeaderPattern, 'bW' . (a:isInner ? 'e' : '')])
 endfunction
 function! s:JumpToHunkEnd( count, isInner )
-    let l:lineNum = custommotion#CountSearch(a:count, [s:diffHunkEndPattern, 'W' . (a:isInner ? '' : 'e')])
+    let l:lineNum = CountJump#CountSearch(a:count, [s:diffHunkEndPattern, 'W' . (a:isInner ? '' : 'e')])
     if a:isInner
 	normal! j
     elseif line('.') < line('$')
@@ -76,7 +87,7 @@ function! s:JumpToHunkEnd( count, isInner )
     endif
     return line('.')
 endfunction
-call custommotion#MakeTextObjectWithTwoCountJumps('<buffer>', 'h', 'ai', 'V',
+call CountJump#TextObject#MakeWithJumpFunctions('<buffer>', 'h', 'ai', 'V',
 \   s:function('s:JumpToHunkBegin'),
 \   s:function('s:JumpToHunkEnd'),
 \)
