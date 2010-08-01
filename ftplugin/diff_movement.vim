@@ -4,12 +4,18 @@
 "   - CountJump.vim, CountJump/Motion.vim, CountJump/TextObjects.vim autoload
 "     scripts. 
 "
-" Copyright: (C) 2009 by Ingo Karkat
+" Copyright: (C) 2009-2010 by Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'. 
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS 
+"	002	16-Jul-2010	BUG: s:JumpToHunkEnd() returned line number, not
+"				position pair. 
+"				BUG: Outer hunk selected next @@...@@ hunk
+"				header line in some cases. Needed to accommodate
+"				'nostartofline' setting in the end position
+"				correction (:normal 0). 
 "	001	12-Feb-2009	file creation from vim_movement.vim
 
 " Avoid installing when in unsupported Vim version. 
@@ -76,16 +82,16 @@ function! s:function(name)
     return function(substitute(a:name, '^s:', matchstr(expand('<sfile>'), '<SNR>\d\+_\zefunction$'),''))
 endfunction 
 function! s:JumpToHunkBegin( count, isInner )
-    return CountJump#CountSearch(a:count, [s:diffHunkHeaderPattern, 'bW' . (a:isInner ? 'e' : '')])
+    return CountJump#CountSearch(a:count, [s:diffHunkHeaderPattern, 'bcW' . (a:isInner ? 'e' : '')])
 endfunction
 function! s:JumpToHunkEnd( count, isInner )
-    let l:lineNum = CountJump#CountSearch(a:count, [s:diffHunkEndPattern, 'W' . (a:isInner ? '' : 'e')])
+    call CountJump#CountSearch(a:count, [s:diffHunkEndPattern, 'W' . (a:isInner ? '' : 'e')])
     if a:isInner
-	normal! j
+	normal! j0
     elseif line('.') < line('$')
-	normal! k
+	normal! k0
     endif
-    return line('.')
+    return [line('.'), 1]
 endfunction
 call CountJump#TextObject#MakeWithJumpFunctions('<buffer>', 'h', 'ai', 'V',
 \   s:function('s:JumpToHunkBegin'),
