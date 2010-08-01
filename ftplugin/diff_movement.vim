@@ -10,6 +10,8 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS 
+"	003	02-Aug-2010	Tested with new CountJump 1.20, adapted and
+"				improved s:JumpToHunkEnd(). 
 "	002	16-Jul-2010	BUG: s:JumpToHunkEnd() returned line number, not
 "				position pair. 
 "				BUG: Outer hunk selected next @@...@@ hunk
@@ -88,17 +90,26 @@ function! s:JumpToHunkBegin( count, isInner )
     if a:isInner
 	normal! j0
     endif
-    return [line('.'), 1]
+    return l:pos
 endfunction
 function! s:JumpToHunkEnd( count, isInner )
-    let l:pos = CountJump#CountSearch(a:count, [s:diffHunkHeaderPattern, 'W'])
-    if l:pos == [0, 0]
-	normal! G0
-	return [line('.'), 1]
-    endif
+    " Due to the multi-line pattern, we somehow must navigate to the actual
+    " start of the diff hunk. This only differs from the cursor position (after
+    " the diff hunk header, position 1) by less than one full line, if at all,
+    " but is significant for certain hunks. 
+    call CountJump#CountSearch(a:count, [s:diffHunkHeaderPattern, 'bcW' . (a:isInner ? 'e' : '')])
 
-    normal! k0
-    return [line('.'), 1]
+    let l:pos = CountJump#CountSearch(a:count, [s:diffHunkEndPattern, 'W' . (a:isInner ? '' : 'e')])
+
+    if ! a:isInner && line('.') < line('$')
+	normal! k0
+	if getline('.') =~# '\*\{4,}$'
+	    " Further adaptation to exclude the context diff separator line in
+	    " an outer text object. 
+	    normal! k0
+	endif
+    endif
+    return l:pos
 endfunction
 call CountJump#TextObject#MakeWithJumpFunctions('<buffer>', 'h', 'aI', 'V',
 \   s:function('s:JumpToHunkBegin'),
