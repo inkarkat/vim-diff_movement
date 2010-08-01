@@ -91,17 +91,14 @@ function! s:JumpToHunkBegin( count, isInner )
     return [line('.'), 1]
 endfunction
 function! s:JumpToHunkEnd( count, isInner )
-    let l:pos = CountJump#CountSearch(a:count, [s:diffHunkHeaderPattern, 'bcW' . (a:isInner ? 'e' : '')])
-    let l:pos =  CountJump#CountSearch(a:count, [s:diffHunkEndPattern, 'W' . (a:isInner ? '' : 'e')])
+    let l:pos = CountJump#CountSearch(a:count, [s:diffHunkHeaderPattern, 'W'])
     if l:pos == [0, 0]
 	normal! G0
 	return [line('.'), 1]
     endif
 
-    if ! a:isInner
-	normal! k0
-    endif
-    return l:pos
+    normal! k0
+    return [line('.'), 1]
 endfunction
 call CountJump#TextObject#MakeWithJumpFunctions('<buffer>', 'h', 'aI', 'V',
 \   s:function('s:JumpToHunkBegin'),
