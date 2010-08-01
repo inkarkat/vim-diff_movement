@@ -82,18 +82,24 @@ function! s:function(name)
     return function(substitute(a:name, '^s:', matchstr(expand('<sfile>'), '<SNR>\d\+_\zefunction$'),''))
 endfunction 
 function! s:JumpToHunkBegin( count, isInner )
-    return CountJump#CountSearch(a:count, [s:diffHunkHeaderPattern, 'bcW' . (a:isInner ? 'e' : '')])
-endfunction
-function! s:JumpToHunkEnd( count, isInner )
-    call CountJump#CountSearch(a:count, [s:diffHunkEndPattern, 'W' . (a:isInner ? '' : 'e')])
+    let l:pos = CountJump#CountSearch(a:count, [s:diffHunkHeaderPattern, 'bcW' . (a:isInner ? 'e' : '')])
+    if l:pos == [0, 0] | return l:pos | endif
+
     if a:isInner
 	normal! j0
-    elseif line('.') < line('$')
+    endif
+    return [line('.'), 1]
+endfunction
+function! s:JumpToHunkEnd( count, isInner )
+    let l:pos =  CountJump#CountSearch(a:count, [s:diffHunkEndPattern, 'W' . (a:isInner ? '' : 'e')])
+    if l:pos == [0, 0] | return l:pos | endif
+
+    if ! a:isInner && line('.') < line('$')
 	normal! k0
     endif
     return [line('.'), 1]
 endfunction
-call CountJump#TextObject#MakeWithJumpFunctions('<buffer>', 'h', 'ai', 'V',
+call CountJump#TextObject#MakeWithJumpFunctions('<buffer>', 'h', 'aI', 'V',
 \   s:function('s:JumpToHunkBegin'),
 \   s:function('s:JumpToHunkEnd'),
 \)
