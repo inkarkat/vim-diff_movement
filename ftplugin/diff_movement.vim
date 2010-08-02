@@ -84,6 +84,12 @@ function! s:function(name)
     return function(substitute(a:name, '^s:', matchstr(expand('<sfile>'), '<SNR>\d\+_\zefunction$'),''))
 endfunction 
 function! s:JumpToHunkBegin( count, isInner )
+    " Enable selection of inner hunk even if the cursor is positioned on the
+    " hunk header. 
+    if a:isInner
+	normal! j0
+    endif
+
     let l:pos = CountJump#CountSearch(a:count, [s:diffHunkHeaderPattern, 'bcW' . (a:isInner ? 'e' : '')])
     if l:pos == [0, 0] | return l:pos | endif
 
