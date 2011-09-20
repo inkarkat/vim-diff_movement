@@ -4,12 +4,15 @@
 "   - CountJump.vim, CountJump/Motion.vim, CountJump/TextObjects.vim autoload
 "     scripts. 
 "
-" Copyright: (C) 2009-2010 by Ingo Karkat
+" Copyright: (C) 2009-2010 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'. 
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS 
+" 1.00.004	03-Aug-2010	FIX: Multiple [count] text objects were broken
+"				by the jump to the actual diff hunk start; must
+"				only do a one-step jump there. 
 "	003	02-Aug-2010	Tested with new CountJump 1.20, adapted and
 "				improved s:JumpToHunkEnd(). 
 "	002	16-Jul-2010	BUG: s:JumpToHunkEnd() returned line number, not
@@ -103,7 +106,7 @@ function! s:JumpToHunkEnd( count, isInner )
     " start of the diff hunk. This only differs from the cursor position (after
     " the diff hunk header, position 1) by less than one full line, if at all,
     " but is significant for certain hunks. 
-    call CountJump#CountSearch(a:count, [s:diffHunkHeaderPattern, 'bcW' . (a:isInner ? 'e' : '')])
+    call CountJump#CountSearch(1, [s:diffHunkHeaderPattern, 'bcW' . (a:isInner ? 'e' : '')])
 
     let l:pos = CountJump#CountSearch(a:count, [s:diffHunkEndPattern, 'W' . (a:isInner ? '' : 'e')])
 
