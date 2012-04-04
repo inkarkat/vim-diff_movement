@@ -1,0 +1,14 @@
+DESCRIPTION
+This filetype plugin provides movement commands and text objects for diff hunks.
+Supports traditional, context and unified diff formats. 
+
+USAGE
+			Move around diff hunks: 
+]]			Go to [count] next start of a diff hunk. 
+][			Go to [count] next end of a diff hunk. 
+[[			Go to [count] previous start of a diff hunk. 
+[]			Go to [count] previous end of a diff hunk. 
+
+ih			"inner hunk" text object, select [count] hunk contents. 
+ah			"a hunk" text object, select [count] hunks, including
+			the header. 
