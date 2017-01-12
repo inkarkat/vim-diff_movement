@@ -2,6 +2,10 @@ DESCRIPTION
 This filetype plugin provides movement commands and text objects for diff hunks.
 Supports traditional, context and unified diff formats.
 
+RELATED WORKS
+- textobj-gitgutter (vimscript #4458) provides an inner-hunk text object for
+  hunks provided by the vim-gitgutter plugin. It also requires textobj-user.
+
 USAGE
                         Move around diff hunks:
 ]]                      Go to [count] next start of a diff hunk.
