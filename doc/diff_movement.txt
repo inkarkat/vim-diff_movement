@@ -1,0 +1,5 @@
+1.01    05-Jun-2013
+Avoid use of s:function() by using autoload function name. This fixes a regression in Vim 7.3.1032, reported by lilydjwg.
+
+1.00	03-Aug-2010
+First published version.
